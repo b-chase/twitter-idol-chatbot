@@ -1,9 +1,14 @@
 from tensorflow import keras
-from preprocess import *
-import numpy as np
 from keras.layers import Input, LSTM, Dense
 from keras.models import Model, load_model
-from training_model import decoder_inputs, decoder_lstm, decoder_dense, encoder_input_data, num_decoder_tokens, num_encoder_tokens
+from tensorflow.compat.v1 import ConfigProto
+from tensorflow.compat.v1 import InteractiveSession
+config = ConfigProto()
+config.gpu_options.allow_growth = True
+session = InteractiveSession(config=config)
+import numpy as np
+
+from preprocess import *
 
 training_model = load_model("training_model.h5")
 
@@ -13,7 +18,6 @@ encoder_states = [state_h_enc, state_c_enc]
 
 encoder_model = Model(encoder_inputs, encoder_states)
 
-latent_dim = 256
 decoder_state_input_hidden = Input(shape=(latent_dim,))
 decoder_state_input_cell = Input(shape=(latent_dim,))
 decoder_states_inputs = [decoder_state_input_hidden, decoder_state_input_cell]
@@ -23,6 +27,8 @@ decoder_states = [state_hidden, state_cell]
 decoder_outputs = decoder_dense(decoder_outputs)
 decoder_model = Model([decoder_inputs] + decoder_states_inputs, [decoder_outputs] + decoder_states)
 
+encoder_model.save("encoder_model.h5")
+decoder_model.save("decoder_model.h5")
 
 def decode_sequence(test_input):
 	encoder_states_value = encoder_model.predict(test_input)
@@ -47,6 +53,7 @@ def decode_sequence(test_input):
 		# or find stop token.
 		if (sampled_token == '<END>' or len(decoded_sentence) > max_decoder_seq_length):
 			stop_condition = True
+			decoded_sentence.replace(" <END>", "")
 
 		# Update the target sequence (of length 1).
 		target_seq = np.zeros((1, 1, num_decoder_tokens))
@@ -57,8 +64,6 @@ def decode_sequence(test_input):
 
 	return decoded_sentence
 
-
-print(answers)
 for seq_index in range(11):
 	test_input = encoder_input_data[seq_index: seq_index + 1]
 	decoded_sentence = decode_sequence(test_input)
@@ -66,3 +71,4 @@ for seq_index in range(11):
 	print('Input sentence:', questions[seq_index])
 	print('Target sentence:', answers[seq_index])
 	print('Decoded sentence:', decoded_sentence)
+

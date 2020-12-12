@@ -30,7 +30,7 @@ for i in range(max_bulk):
 		print(f"error downloading tweets, stopping at tweet #{i}")
 		break
 sleeptime = 60
-with open("saved_tweets2.txt", "w") as savefile:
+with open(f"{twitter_handle}-tweets.txt", "w") as savefile:
 	for i, line in enumerate(big_list_of_tweets):
 		# print(line)
 		text = line['full_text']
