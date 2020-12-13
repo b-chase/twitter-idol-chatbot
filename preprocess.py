@@ -62,14 +62,14 @@ decoder_target_data = np.zeros(
 for line, (input_doc, target_doc) in enumerate(zip(questions, answers)):
 
 	for timestep, token in enumerate(input_doc):
-		#print("Encoder input timestep & token:", timestep, token)
+		print("Encoder input timestep & token:", timestep, token)
 		# Assign 1. for the current line, timestep, & word
 		# in encoder_input_data:
 		encoder_input_data[line, timestep, input_features_dict[token]] = 1.
 
 	for timestep, token in enumerate(target_doc):
 		# decoder_target_data is ahead of decoder_input_data by one timestep
-		#print("Decoder input timestep & token:", timestep, token)
+		print("Decoder input timestep & token:", timestep, token)
 		# Assign 1. for the current line, timestep, & word
 		# in decoder_input_data:
 		decoder_input_data[line, timestep, target_features_dict[token]] = 1.

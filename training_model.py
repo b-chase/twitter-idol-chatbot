@@ -11,8 +11,8 @@ session = InteractiveSession(config=config)
 training_model = Model([encoder_inputs, decoder_inputs], decoder_outputs)
 training_model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
 
-batch_size = 10
-epochs = 50
+batch_size = 50
+epochs = 500
 
 print("Training the model:\n")
 # Train the model:
