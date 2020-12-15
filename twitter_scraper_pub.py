@@ -3,12 +3,12 @@ from twitter import TwitterHTTPError
 from urllib.error import HTTPError
 import re, time
 
-access_token = "1061559864239910912-ft8g9lCsrC26rlK9FPoubZ3lIAnCIs"
-access_secret = "YBIflHcBz1epCI5rUL1uApqyp4RSwTMXdGbYghT2putTZ"
-consumer_key = "wJJc579miZHNyJJt9SwutD4nb"
-consumer_secret = "QoexBqhop4pyACzbJUllp5NxnDwmb2EDxdKj6OvLJm9BAIwoBG"
-bearer_token = "AAAAAAAAAAAAAAAAAAAAAB9BKgEAAAAAIIlipt0CXlUQ%2FYLDI0tZwYMBifo" \
-               "%3DzGF1UY2ZOWuPFLGi3KIhM956EwbyEjSfIoc8xiRM1E5qGWQy4b "
+# In order to use this program you must sign up to be a twitter developer and obtain access to their API with the following tokens:
+access_token = ""
+access_secret = ""
+consumer_key = ""
+consumer_secret = ""
+bearer_token = ""
 
 t = tw.Twitter(auth=tw.OAuth(access_token, access_secret, consumer_key, consumer_secret))
 
@@ -71,4 +71,4 @@ def pull_and_save_tweets(twitter_handle):
 					print("Reply id:", reply)
 	return
 
-pull_and_save_tweets("benjaminwittes")
+pull_and_save_tweets("ENTER_TWITTER_HANDLE_HERE")
