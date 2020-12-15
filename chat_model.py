@@ -1,7 +1,7 @@
 from preprocess import input_features_dict, target_features_dict, reverse_input_features_dict, \
 	reverse_target_features_dict, max_decoder_seq_length, questions, answers, input_tokens, target_tokens, \
 	max_encoder_seq_length, decoder_inputs, decoder_lstm, decoder_dense, encoder_input_data, num_decoder_tokens, \
-	num_encoder_tokens, process_text
+	num_encoder_tokens, process_text, latent_dim
 
 from keras.layers import Input, LSTM, Dense
 from keras.models import Model, load_model
@@ -16,7 +16,7 @@ encoder_states = [state_h_enc, state_c_enc]
 
 encoder_model = Model(encoder_inputs, encoder_states)
 
-latent_dim = 256
+
 decoder_state_input_hidden = Input(shape=(latent_dim,))
 decoder_state_input_cell = Input(shape=(latent_dim,))
 decoder_states_inputs = [decoder_state_input_hidden, decoder_state_input_cell]
@@ -46,8 +46,10 @@ def decode_sequence(test_input):
 		output_tokens, hidden_state, cell_state = decoder_model.predict(
 			[target_seq] + states_value)
 
-		# Choose token with highest probability
-		sampled_token_index = np.argmax(output_tokens[0, -1, :])
+		# Choose token with highest probability, or weighted to probability
+		#sampled_token_index = np.argmax(output_tokens[0, -1, :])
+		sampled_token_index = np.random.choice(len(output_tokens[0, -1, :]), p=output_tokens[0, -1, :])
+
 		sampled_token = reverse_target_features_dict[sampled_token_index]
 		decoded_sentence += " " + sampled_token
 
@@ -66,7 +68,7 @@ def decode_sequence(test_input):
 	return decoded_sentence
 
 
-for seq_index in range(11):
+for seq_index in range(15, 20):
 	test_input = encoder_input_data[seq_index: seq_index + 1]
 	#print("test_input:", test_input)
 	decoded_sentence = decode_sequence(test_input)

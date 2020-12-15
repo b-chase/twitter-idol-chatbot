@@ -1,10 +1,11 @@
+import random
 import re
+
 import numpy as np
 from keras.layers import Input, LSTM, Dense
-from keras.models import Model
 
 
-with open("saved_tweets2.txt", 'r') as tweets_file:
+with open("benjaminwittes-tweets.txt", 'r') as tweets_file:
 	corpus = tweets_file.read().lower().split("+++||+++")
 
 
@@ -30,11 +31,15 @@ for i, line in enumerate(corpus):
 		answers.append(cleaned_tokens)
 		target_tokens.extend(cleaned_tokens)
 
+pairs = list(zip(questions, answers))
+random.shuffle(pairs)
+questions = [x[0] for x in pairs]
+answers = [x[1] for x in pairs]
+
 input_tokens = sorted(list(set(input_tokens)))
 target_tokens = sorted(list(set(target_tokens)))
 num_encoder_tokens = len(input_tokens)
 num_decoder_tokens = len(target_tokens)
-
 
 max_encoder_seq_length = max([len(line) for line in questions])
 max_decoder_seq_length = max([len(line) for line in answers])
@@ -62,14 +67,14 @@ decoder_target_data = np.zeros(
 for line, (input_doc, target_doc) in enumerate(zip(questions, answers)):
 
 	for timestep, token in enumerate(input_doc):
-		print("Encoder input timestep & token:", timestep, token)
+		# print("Encoder input timestep & token:", timestep, token)
 		# Assign 1. for the current line, timestep, & word
 		# in encoder_input_data:
 		encoder_input_data[line, timestep, input_features_dict[token]] = 1.
 
 	for timestep, token in enumerate(target_doc):
 		# decoder_target_data is ahead of decoder_input_data by one timestep
-		print("Decoder input timestep & token:", timestep, token)
+		# print("Decoder input timestep & token:", timestep, token)
 		# Assign 1. for the current line, timestep, & word
 		# in decoder_input_data:
 		decoder_input_data[line, timestep, target_features_dict[token]] = 1.
@@ -77,13 +82,12 @@ for line, (input_doc, target_doc) in enumerate(zip(questions, answers)):
 		if timestep > 0:
 			# decoder_target_data is ahead by 1 timestep
 			# and doesn't include the start token.
-			#print("Decoder target timestep:", timestep)
+			# print("Decoder target timestep:", timestep)
 			# Assign 1. for the current line, timestep, & word
 			# in decoder_target_data:
 			decoder_target_data[line, timestep - 1, target_features_dict[token]] = 1.
 
-
-latent_dim = 256
+latent_dim = 25
 
 encoder_inputs = Input(shape=(None, num_encoder_tokens))
 encoder_lstm = LSTM(latent_dim, return_state=True)
@@ -96,4 +100,4 @@ decoder_outputs, decoder_state_hidden, decoder_state_cell = decoder_lstm(decoder
 decoder_dense = Dense(num_decoder_tokens, activation="softmax")
 decoder_outputs = decoder_dense(decoder_outputs)
 
-
+# dropout_layer = Dropout(10, 1, num_encoder_tokens)
