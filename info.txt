@@ -1,3 +1,0 @@
-pulling data from twitter API: https://developer.twitter.com/
-using transformer chatbot idea from: https://medium.com/tensorflow/a-transformer-chatbot-tutorial-with-tensorflow-2-0-88bf59e66fe2
-
