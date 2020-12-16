@@ -13,7 +13,6 @@ except ImportError:
     access_secret = ""
     consumer_key = ""
     consumer_secret = ""
-    bearer_token = ""
 
 t = tw.Twitter(auth=tw.OAuth(access_token, access_secret, consumer_key, consumer_secret))
 
