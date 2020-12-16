@@ -1,16 +1,24 @@
 from prepare_text_model import *
 from matplotlib import pyplot as plt
+import random
 
-epochs = 500
+# Can optionally start from original point
+if False:
+	training_model.load_weights("model_weights.h5")
 
-fit_model = training_model.fit(dataset, epochs=epochs)
-
-training_model.save_weights("model_weights.h5")
-
-for i in range(20,30):
-	predict(orig_questions[i])
+epochs = 10
+samples = len(orig_questions)
+cycles = 20
+for i in range(cycles):
+	print(f"Fitting next 10 epochs, starting from #{i*epochs+1} (Will be {cycles*epochs} total)")
+	fit_model = training_model.fit(dataset, epochs=epochs)
+	training_model.save_weights("model_weights.h5")
+	print("\nTesting model prediction:")
+	for i in range(3):
+		predict(random.choice(orig_questions))
+		print("---")
+	predict("What do you like to do in your free time?")
 	print("---")
-predict("How are you feeling?")
 
 
 train_loss = fit_model.history['loss']

@@ -6,14 +6,14 @@ import time
 
 # In order to use this program you must sign up to be a twitter developer 
 # and obtain access to their API with the following tokens:
-if False:
+try:
+    from twitter_keys import access_secret, access_token, consumer_key, consumer_secret
+except ImportError:
     access_token = ""
     access_secret = ""
     consumer_key = ""
     consumer_secret = ""
     bearer_token = ""
-else:
-    from twitter_keys import access_secret, access_token, consumer_key, consumer_secret
 
 t = tw.Twitter(auth=tw.OAuth(access_token, access_secret, consumer_key, consumer_secret))
 
@@ -23,8 +23,8 @@ def pull_and_save_tweets(twitter_handle):
                                                   include_rts=False,
                                                   count=1000,
                                                   tweet_mode='extended')
-    max_bulk = 100
-    sleep_time = 10
+    max_bulk = 500
+    sleep_time = 120
     for i in range(max_bulk):
         print(f"Downloading tweets, part {i + 1} of {max_bulk}")
         max_id = big_list_of_tweets[-1]["id"] - 1
@@ -42,7 +42,8 @@ def pull_and_save_tweets(twitter_handle):
         except:
             print(f"error downloading tweets, stopping at tweet #{i}")
             break
-    sleep_time = 75
+    time.sleep(sleep_time)
+    sleep_time = 60
     with open(f"{twitter_handle}_tweets.txt", "w") as savefile:
         print(f"Saving file as '{savefile.name}'")
         for i, line in enumerate(big_list_of_tweets):
@@ -77,4 +78,4 @@ def pull_and_save_tweets(twitter_handle):
     return
 
 
-pull_and_save_tweets("ENTER_TWITTER_HANDLE_HERE")
+pull_and_save_tweets("benjaminwittes")

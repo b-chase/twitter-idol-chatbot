@@ -1,10 +1,12 @@
+# reference: https://medium.com/tensorflow/a-transformer-chatbot-tutorial-with-tensorflow-2-0-88bf59e66fe2
+
 import numpy as np
 import re, os, sys
 import tensorflow as tf
+
 assert tf.__version__.startswith('2')
 # tf.random.set_seed(1234)
 import tensorflow_datasets as tfds
-
 
 with open("natesilver538_tweets.txt", 'r') as tweets_file:
 	corpus = tweets_file.read().lower().split("+++||+++")
@@ -48,9 +50,10 @@ START_TOKEN, END_TOKEN = [tokenizer.vocab_size], [tokenizer.vocab_size + 1]
 # Vocabulary size plus start and end token
 VOCAB_SIZE = tokenizer.vocab_size + 2
 
-#print("Original_question:", corpus[40].strip())
-#print("Processed question:", orig_questions[20])
-#print('Tokenized sample question: {}'.format(tokenizer.encode(questions[20])))
+
+# print("Original_question:", corpus[40].strip())
+# print("Processed question:", orig_questions[20])
+# print('Tokenized sample question: {}'.format(tokenizer.encode(questions[20])))
 
 
 # Tokenize, filter and pad sentences
@@ -76,7 +79,7 @@ def tokenize_and_filter(inputs, outputs):
 
 
 questions, answers = tokenize_and_filter(questions, answers)
-#print("Tokenized and filtered question:", questions[20])
+# print("Tokenized and filtered question:", questions[20])
 
 print('Vocab size: {}'.format(VOCAB_SIZE))
 print('Number of samples: {}'.format(len(questions)))
@@ -198,7 +201,7 @@ class PositionalEncoding(tf.keras.layers.Layer):
 
 	def get_config(self):
 		config = super().get_config().copy()
-		config.update({'pos_encoding' : self.pos_encoding})
+		config.update({'pos_encoding': self.pos_encoding})
 		return config
 
 	def get_angles(self, position, i, d_model):
@@ -451,6 +454,8 @@ def accuracy(y_true, y_pred):
 
 
 training_model.compile(optimizer=optimizer, loss=loss_function, metrics=[accuracy])
+
+
 # training_model.compile(optimizer=optimizer, loss='SparseCategoricalCrossentropy', metrics=['accuracy'])
 
 
@@ -458,9 +463,9 @@ training_model.compile(optimizer=optimizer, loss=loss_function, metrics=[accurac
 
 def evaluate(sentence):
 	sentence = preprocess_sentence(sentence)[0]
-	#print("Pre-processed sentence:", sentence)
+	# print("Pre-processed sentence:", sentence)
 	input_sent = START_TOKEN + tokenizer.encode(sentence) + END_TOKEN
-	#print(input_sent)
+	# print(input_sent)
 	sentence = tf.expand_dims(input_sent, axis=0)
 
 	output = tf.expand_dims(START_TOKEN, 0)
@@ -483,14 +488,14 @@ def evaluate(sentence):
 	return tf.squeeze(output, axis=0)
 
 
-def predict(sentence):
+def predict(sentence, quiet=False):
 	prediction = evaluate(sentence)
 
 	predicted_sentence = tokenizer.decode(
 		[i for i in prediction if i < tokenizer.vocab_size])
 
-	print('Input: {}'.format(sentence))
-	print('Output: {}'.format(predicted_sentence))
+	if not quiet:
+		print('Input: {}'.format(sentence))
+		print('Output: {}'.format(predicted_sentence))
 
 	return predicted_sentence
-
