@@ -2,7 +2,7 @@ import re
 from tensorflow import keras
 from keras.layers import Input, LSTM, Dense
 from keras.models import Model, load_model
-from preprocess import *
+from prepare_text_model import *
 
 encoder_model = load_model("encoder_model.h5")
 decoder_model = load_model("decoder_model.h5")
