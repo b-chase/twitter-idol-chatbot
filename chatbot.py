@@ -1,5 +1,5 @@
 from prepare_text_model import *
-training_model.load_weights("model_weights.h5")
+training_model.load_weights(f"{user}_weights.h5")
 
 
 class ChatBot:

@@ -4,30 +4,32 @@ import random
 
 # Can optionally start from original point
 if False:
-	training_model.load_weights("model_weights.h5")
+    training_model.load_weights(f"{user}_weights.h5")
+
+test_questions = ["What do you like to do in your free time?",
+                  "What is your favorite country?",
+                  "How are you feeling today?",
+                  "Can you tell me a secret?",
+                  "Do you think the weather will be nice tomorrow?"]
 
 epochs = 10
-samples = len(orig_questions)
+samples = len(ori g_questions)
 cycles = 20
 for i in range(cycles):
-	print(f"Fitting next 10 epochs, starting from #{i*epochs+1} (Will be {cycles*epochs} total)")
-	fit_model = training_model.fit(dataset, epochs=epochs)
-	training_model.save_weights("model_weights.h5")
-	print("\nTesting model prediction:")
-	for i in range(3):
-		predict(random.choice(orig_questions))
-		print("---")
-	predict("What do you like to do in your free time?")
-	print("---")
-
+    print(f"Fitting next {epochs} epochs, starting from #{i * epochs + 1} (Will be {cycles * epochs} total)")
+    fit_model = training_model.fit(dataset, epochs=epochs)
+    training_model.save_weights(f"{user}_weights.h5")
+    print("\n>>Testing model prediction:<<")
+    for q in test_questions:
+        predict(q)
+        print("---")
 
 train_loss = fit_model.history['loss']
-#val_loss = fit_model.history['val_loss']
-xc = range(1, epochs+1)
+# val_loss = fit_model.history['val_loss']
+xc = range(1, epochs + 1)
 
 plt.figure()
 plt.plot(xc, train_loss, 'blue', label="Training Loss")
-#plt.plot(xc, val_loss, 'red', label="Validation Loss")
+# plt.plot(xc, val_loss, 'red', label="Validation Loss")
 plt.legend()
 plt.show()
-

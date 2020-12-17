@@ -20,9 +20,9 @@ t = tw.Twitter(auth=tw.OAuth(access_token, access_secret, consumer_key, consumer
 def pull_and_save_tweets(twitter_handle):
     big_list_of_tweets = t.statuses.user_timeline(screen_name=twitter_handle,
                                                   include_rts=False,
-                                                  count=1000,
+                                                  count=200,
                                                   tweet_mode='extended')
-    max_bulk = 500
+    max_bulk = 600
     sleep_time = 120
     for i in range(max_bulk):
         print(f"Downloading tweets, part {i + 1} of {max_bulk}")
@@ -31,16 +31,14 @@ def pull_and_save_tweets(twitter_handle):
             big_list_of_tweets.extend(
                 t.statuses.user_timeline(screen_name=twitter_handle,
                                          include_rts=False,
-                                         count=1000,
+                                         count=200,
                                          tweet_mode='extended',
                                          max_id=str(max_id)))
         except HTTPError or TwitterHTTPError:
             print(f"Twitter rate limit error. Sleeping for {sleep_time} seconds")
             time.sleep(sleep_time)
             sleep_time = int(sleep_time * 1.71)
-        except:
-            print(f"error downloading tweets, stopping at tweet #{i}")
-            break
+    print("Taking a short break...")
     time.sleep(sleep_time)
     sleep_time = 60
     with open(f"{twitter_handle}_tweets.txt", "w") as savefile:
@@ -66,15 +64,21 @@ def pull_and_save_tweets(twitter_handle):
                     print(f"Line {i}: ", "Can't write this text to the file ")
                     print(">>", leading_tweet['full_text'])
                     print(">>", line['full_text'])
-                except TwitterHTTPError as err:
-                    print(err.response_data)
+                except TwitterHTTPError or HTTPError as err:
+                    print(err)
                     if err.response_data['errors'][0]['message'] == 'Rate limit exceeded':
                         print("ending now")
                         break
-                except:
+                except Exception as err:
+                    print(err)
                     print("Error, seems a tweet was deleted")
                     print("Reply id:", reply)
     return
 
 
-pull_and_save_tweets("benjaminwittes")
+# some popular/active twitter users, but use whoever you want!
+pull_and_save_tweets("MollyJongFast")
+pull_and_save_tweets("HamillHimself")
+pull_and_save_tweets("maggieNYT")
+pull_and_save_tweets("yashar")
+

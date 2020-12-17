@@ -1,15 +1,29 @@
 # reference: https://medium.com/tensorflow/a-transformer-chatbot-tutorial-with-tensorflow-2-0-88bf59e66fe2
 
-import numpy as np
-import re, os, sys
+import re
+
 import tensorflow as tf
 
 assert tf.__version__.startswith('2')
-# tf.random.set_seed(1234)
 import tensorflow_datasets as tfds
 
-with open("natesilver538_tweets.txt", 'r') as tweets_file:
-	corpus = tweets_file.read().lower().split("+++||+++")
+
+# tf.random.set_seed(1234)
+
+
+def get_corpus(tweets_file):
+	with open(tweets_file, 'r') as tweets_file:
+		file_contents = tweets_file.read().lower().split("+++||+++")
+	return file_contents
+
+
+user = 'combo'
+corpus = []
+user_list = ["realDonaldTrump", "natesilver538", "benjaminwittes"]
+if user == 'combo':
+	for u in user_list:
+		corpus.extend(get_corpus(f"{u}_tweets.txt"))
+
 
 
 def preprocess_sentence(sentence, debug=False):
@@ -20,8 +34,9 @@ def preprocess_sentence(sentence, debug=False):
 	sentence = " ".join(tokenized_sentence)
 	# creating a space between a word and the punctuation following it
 	# eg: "he is a boy." => "he is a boy ."
+	sentence = re.sub(r"\.\.+", " ", sentence)
 	sentence = re.sub(r"([?.!,])", r" \1 ", sentence)
-	sentence = re.sub(r'[" "]+', " ", sentence)
+	sentence = re.sub(r'[\s]+', " ", sentence)
 	# replacing everything with space except (a-z, A-Z, ".", "?", "!", ",")
 	sentence = re.sub(r"[^a-zA-Z?.!,]+", " ", sentence)
 	sentence = sentence.strip()
@@ -50,10 +65,10 @@ START_TOKEN, END_TOKEN = [tokenizer.vocab_size], [tokenizer.vocab_size + 1]
 # Vocabulary size plus start and end token
 VOCAB_SIZE = tokenizer.vocab_size + 2
 
-
-# print("Original_question:", corpus[40].strip())
-# print("Processed question:", orig_questions[20])
-# print('Tokenized sample question: {}'.format(tokenizer.encode(questions[20])))
+if True:
+	print("Original_question:", corpus[40].strip())
+	print("Processed question:", orig_questions[20])
+	print('Tokenized sample question: {}'.format(tokenizer.encode(questions[20])))
 
 
 # Tokenize, filter and pad sentences
@@ -231,12 +246,7 @@ def encoder_layer(units, d_model, num_heads, dropout, name="encoder_layer"):
 	padding_mask = tf.keras.Input(shape=(1, 1, None), name="padding_mask")
 
 	attention = MultiHeadAttention(
-		d_model, num_heads, name="attention")({
-		'query': inputs,
-		'key': inputs,
-		'value': inputs,
-		'mask': padding_mask
-	})
+		d_model, num_heads, name="attention")({'query': inputs, 'key': inputs, 'value': inputs, 'mask': padding_mask})
 	attention = tf.keras.layers.Dropout(rate=dropout)(attention)
 	attention = tf.keras.layers.LayerNormalization(
 		epsilon=1e-6)(inputs + attention)
