@@ -1,7 +1,7 @@
 # reference: https://medium.com/tensorflow/a-transformer-chatbot-tutorial-with-tensorflow-2-0-88bf59e66fe2
 
 import re
-
+import time
 import tensorflow as tf
 
 assert tf.__version__.startswith('2')
@@ -13,24 +13,29 @@ import tensorflow_datasets as tfds
 
 def get_corpus(tweets_file):
 	with open(tweets_file, 'r') as tweets_file:
-		file_contents = tweets_file.read().lower().split("+++||+++")
+		file_contents = tweets_file.read().lower().split("+++$+++")
 	return file_contents
 
 
 user = 'combo'
 corpus = []
-user_list = ["realDonaldTrump", "natesilver538", "benjaminwittes"]
+combo_list = ["MollyJongFast", "HamillHimself", "yashar", "MaggieNYT"]
 if user == 'combo':
-	for u in user_list:
+	for u in combo_list:
 		corpus.extend(get_corpus(f"{u}_tweets.txt"))
+else:
+	corpus = get_corpus(f"{user}_tweets.txt")
 
 
+MAX_LENGTH = 0
 
-def preprocess_sentence(sentence, debug=False):
+
+def preprocess_sentence(sentence, debug=False, get_size=False):
 	sentence = sentence.lower().strip()
 	# removing twitter handles and links:
-	tokenized_sentence = [t.strip() for t in sentence.split() if "@" not in t and "https://" not in t]
+	tokenized_sentence = [t.strip() for t in sentence.split() if "@" not in t and "https://" not in t and "NOQUOTED" not in t]
 	sent_length = len(tokenized_sentence)
+
 	sentence = " ".join(tokenized_sentence)
 	# creating a space between a word and the punctuation following it
 	# eg: "he is a boy." => "he is a boy ."
@@ -41,21 +46,32 @@ def preprocess_sentence(sentence, debug=False):
 	sentence = re.sub(r"[^a-zA-Z?.!,]+", " ", sentence)
 	sentence = sentence.strip()
 	# adding a start and an end token to the sentence
-	return sentence, sent_length
+	if get_size:
+		return sentence, sent_length
+	return sentence
 
 
 questions = []
 answers = []
-MAX_LENGTH = 0
+
 
 for i, line in enumerate(corpus):
-	cleaned_line, size = preprocess_sentence(line)
+	try:
+		[q, a] = line.split("+++|+++")
+	except ValueError:
+		print("error_causing line: id#", i, "\n", line)
+		continue
+	except Exception as err:
+		print("error_causing line: id#", i, "\n", line)
+		raise err
+	q, size = preprocess_sentence(q, get_size=True)
 	if size > MAX_LENGTH:
 		MAX_LENGTH = size
-	if i % 2 == 0:
-		questions.append(cleaned_line)
-	else:
-		answers.append(cleaned_line)
+	a, size = preprocess_sentence(a, get_size=True)
+	if size > MAX_LENGTH:
+		MAX_LENGTH = size
+	questions.append(q)
+	answers.append(a)
 
 orig_questions = questions
 orig_answers = answers
@@ -66,7 +82,7 @@ START_TOKEN, END_TOKEN = [tokenizer.vocab_size], [tokenizer.vocab_size + 1]
 VOCAB_SIZE = tokenizer.vocab_size + 2
 
 if True:
-	print("Original_question:", corpus[40].strip())
+	print("Original_question:", corpus[20].split("+++|+++")[0].strip())
 	print("Processed question:", orig_questions[20])
 	print('Tokenized sample question: {}'.format(tokenizer.encode(questions[20])))
 
@@ -98,7 +114,7 @@ questions, answers = tokenize_and_filter(questions, answers)
 
 print('Vocab size: {}'.format(VOCAB_SIZE))
 print('Number of samples: {}'.format(len(questions)))
-
+time.sleep(10)
 BATCH_SIZE = 64
 BUFFER_SIZE = 20000
 
@@ -472,7 +488,7 @@ training_model.compile(optimizer=optimizer, loss=loss_function, metrics=[accurac
 # call fit from another file, don't want to wait every time we call this file
 
 def evaluate(sentence):
-	sentence = preprocess_sentence(sentence)[0]
+	sentence = preprocess_sentence(sentence)
 	# print("Pre-processed sentence:", sentence)
 	input_sent = START_TOKEN + tokenizer.encode(sentence) + END_TOKEN
 	# print(input_sent)

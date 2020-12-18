@@ -2,6 +2,7 @@ from prepare_text_model import *
 training_model.load_weights(f"{user}_weights.h5")
 
 
+
 class ChatBot:
 	negative_responses = ("no", "nope", "nah", "naw", "not a chance", "sorry")
 	exit_commands = ("quit", "pause", "exit", "goodbye", "bye", "later", "stop")
@@ -32,5 +33,5 @@ class ChatBot:
 		return False
 
 
-natebot = ChatBot()
-natebot.start_chat()
+chatterbot = ChatBot()
+chatterbot.start_chat()

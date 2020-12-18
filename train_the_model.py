@@ -13,8 +13,8 @@ test_questions = ["What do you like to do in your free time?",
                   "Do you think the weather will be nice tomorrow?"]
 
 epochs = 10
-samples = len(ori g_questions)
-cycles = 20
+samples = len(orig_questions)
+cycles = 10
 for i in range(cycles):
     print(f"Fitting next {epochs} epochs, starting from #{i * epochs + 1} (Will be {cycles * epochs} total)")
     fit_model = training_model.fit(dataset, epochs=epochs)
