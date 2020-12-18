@@ -24,4 +24,5 @@ The model weights are saved and loaded without calling the entire fitting proces
 * Fix the output to be punctuated and capitalized properly
 * Add validation checks to transformer model to prevent overfitting
 * allow user to select from list of chatting partner when the boot the program
+* change twitter pulls to take more tweets
  
