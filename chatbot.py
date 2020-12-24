@@ -1,5 +1,5 @@
 from prepare_text_model import *
-training_model.load_weights(f"{user}_weights.h5")
+training_model.load_weights(f"model_weights/{user}_weights.h5")
 
 
 

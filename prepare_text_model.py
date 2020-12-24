@@ -17,15 +17,16 @@ def get_corpus(tweets_file):
 	return file_contents
 
 
-user = 'combo'
+user = 'MollyJongFast'
 corpus = []
-combo_list = ["MollyJongFast", "HamillHimself", "yashar", "MaggieNYT"]
+combo_list = []
+print(f"Building chatbot based on {user}")
+
 if user == 'combo':
 	for u in combo_list:
-		corpus.extend(get_corpus(f"{u}_tweets.txt"))
+		corpus.extend(get_corpus(f"tweet_files/{u}_tweets.txt"))
 else:
-	corpus = get_corpus(f"{user}_tweets.txt")
-
+	corpus = get_corpus(f"tweet_files/{user}_tweets.txt")
 
 MAX_LENGTH = 0
 
@@ -33,7 +34,7 @@ MAX_LENGTH = 0
 def preprocess_sentence(sentence, debug=False, get_size=False):
 	sentence = sentence.lower().strip()
 	# removing twitter handles and links:
-	tokenized_sentence = [t.strip() for t in sentence.split() if "@" not in t and "https://" not in t and "NOQUOTED" not in t]
+	tokenized_sentence = [t.strip() for t in sentence.split() if "@" not in t and "https://" not in t]
 	sent_length = len(tokenized_sentence)
 
 	sentence = " ".join(tokenized_sentence)
@@ -54,10 +55,11 @@ def preprocess_sentence(sentence, debug=False, get_size=False):
 questions = []
 answers = []
 
-
 for i, line in enumerate(corpus):
 	try:
 		[q, a] = line.split("+++|+++")
+		if "NOQUOTED" in q:
+			continue
 	except ValueError:
 		print("error_causing line: id#", i, "\n", line)
 		continue
@@ -114,7 +116,9 @@ questions, answers = tokenize_and_filter(questions, answers)
 
 print('Vocab size: {}'.format(VOCAB_SIZE))
 print('Number of samples: {}'.format(len(questions)))
+
 time.sleep(10)
+
 BATCH_SIZE = 64
 BUFFER_SIZE = 20000
 
@@ -416,11 +420,11 @@ def transformer(vocab_size, num_layers, units, d_model, num_heads, dropout, name
 
 tf.keras.backend.clear_session()
 
-NUM_LAYERS = 2
-D_MODEL = 256
+NUM_LAYERS = 3
+D_MODEL = 80
 NUM_HEADS = 8
 UNITS = 512
-DROPOUT = 0.1
+DROPOUT = 0.5
 
 training_model = transformer(
 	vocab_size=VOCAB_SIZE,
