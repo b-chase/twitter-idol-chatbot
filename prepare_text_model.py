@@ -17,7 +17,7 @@ def get_corpus(tweets_file):
 	return file_contents
 
 
-user = 'MollyJongFast'
+user = '{ENTER TWITTER HANDLE HERE}'
 corpus = []
 combo_list = []
 print(f"Building chatbot based on {user}")
